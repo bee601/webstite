@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NightfallNetwork — Minecraft Server</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00d4ff;
+            --primary-dark: #00a8cc;
+            --accent: #a855f7;
+            --bg-dark: #0a0e27;
+            --bg-darker: #050812;
+            --text-light: #e5e7eb;
+            --text-muted: #9ca3af;
+            --border: #1e293b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-darker) 0%, #1a1f3a 100%);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Header Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            background: rgba(10, 14, 39, 0.7);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            color: var(--text-light);
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        nav {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .btn-store {
+            padding: 10px 20px;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            border-radius: 8px;
+            cursor: pointer;
+            background: transparent;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-store:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Main Content */
+        main {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-top: 80px;
+            animation: fadeIn 1s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .hero-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 40px;
+            animation: scaleIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .hero h1 {
+            font-size: 72px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            animation: slideUp 0.8s ease-out 0.2s both;
+        }
+
+        .hero h1 .primary {
+            color: var(--primary);
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 60px;
+            animation: slideUp 0.8s ease-out 0.4s both;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .status-box {
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            padding: 30px;
+            width: fit-content;
+            margin: 0 auto;
+            animation: slideUp 0.8s ease-out 0.6s both;
+        }
+
+        .status-box h3 {
+            color: var(--text-muted);
+            font-size: 12px;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .player-count {
+            font-size: 48px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .refresh-btn {
+            margin-top: 15px;
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: auto;
+            margin-right: auto;
+            transition: opacity 0.3s;
+        }
+
+        .refresh-btn:hover {
+            opacity: 0.7;
+        }
+
+        /* Server IP Section */
+        .server-ip-section {
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .ip-box {
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            padding: 20px 30px;
+            width: fit-content;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .ip-label {
+            color: var(--text-muted);
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+
+        .ip-address {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text-light);
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+        .copy-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            color: var(--primary);
+            font-size: 12px;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 60px;
+            font-weight: 900;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--text-light);
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* How to Join Section */
+        .how-to-join {
+            padding: 100px 40px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.02) 0%, transparent 100%);
+        }
+
+        .how-to-join-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .step-card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, transparent 100%);
+        }
+
+        .step-number {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .step-card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .step-card p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Discord Section */
+        .discord-section {
+            padding: 100px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .discord-content {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 60px;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.05) 0%, rgba(0, 212, 255, 0.05) 100%);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .discord-left h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            font-weight: 900;
+        }
+
+        .discord-left p {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .discord-features {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .discord-feature {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .discord-feature-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--accent);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+
+        .discord-feature-text h4 {
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .discord-feature-text p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .join-discord-btn {
+            padding: 12px 30px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .join-discord-btn:hover {
+            background: #9333ea;
+            transform: translateY(-2px);
+        }
+
+        .discord-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .discord-icon {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, var(--accent), #9333ea);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            margin-bottom: 30px;
+        }
+
+        .discord-right h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .discord-right p {
+            color: var(--text-muted);
+        }
+
+        /* Plugins Section */
+        .plugins-section {
+            padding: 100px 40px;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.02) 0%, transparent 100%);
+        }
+
+        .plugins-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 60px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+            text-align: center;
+        }
+
+        .plugins-container h2 {
+            font-size: 48px;
+            margin-bottom: 30px;
+            font-weight: 900;
+        }
+
+        .plugins-container p {
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .plugins-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 0;
+        }
+
+        .plugin-tag {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .plugin-tag:hover {
+            background: var(--primary);
+            color: var(--bg-dark);
+        }
+
+        /* Store Section */
+        .store-section {
+            padding: 100px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .store-container {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 60px;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%);
+        }
+
+        .store-container p {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .visit-store-btn {
+            padding: 14px 40px;
+            background: linear-gradient(135deg, var(--accent), #9333ea);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .visit-store-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+        }
+
+        .store-notice {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            nav {
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero h1 {
+                font-size: 42px;
+            }
+
+            .section-title {
+                font-size: 32px;
+            }
+
+            .discord-content {
+                grid-template-columns: 1fr;
+                padding: 30px;
+            }
+
+            .plugins-container {
+                padding: 30px;
+            }
+
+            .store-container {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Header -->
+    <header>
+        <a href="#" class="logo">
+            <span>Nightfall</span>Network
+        </a>
+        <nav>
+            <a href="#features">Features</a>
+            <a href="#how-to-join">How to Join</a>
+            <a href="#discord">Discord</a>
+            <button class="btn-store" onclick="alert('Store coming soon!')">🛍️ Store</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-logo">🌙</div>
+            <h1><span class="primary">Nightfall</span> Network</h1>
+            <p class="hero-subtitle">A Minecraft server built different — custom plugins, unique gameplay, and a thriving community waiting for you.</p>
+            <div class="status-box">
+                <h3>👥 PLAYERS ONLINE</h3>
+                <div class="player-count">0</div>
+                <div class="server-status">
+                    <div class="status-dot"></div>
+                    <span>SERVER ONLINE</span>
+                </div>
+                <button class="refresh-btn">🔄 Refresh</button>
+            </div>
+        </section>
+
+        <!-- Server IP Section -->
+        <section class="server-ip-section">
+            <div class="ip-box">
+                <div>
+                    <div class="ip-label">SERVER IP</div>
+                    <div class="ip-label">EXPLORE</div>
+                </div>
+                <div class="ip-address">nightfallnetwork.xyz</div>
+                <button class="copy-btn" onclick="copyToClipboard('nightfallnetwork.xyz')">📋</button>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <div class="section-label">WHAT MAKES US DIFFERENT</div>
+            <h2 class="section-title">Built From the Ground Up</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 50px;">Every plugin on NightfallNetwork is crafted in-house. No recycled, off-the-shelf solutions — just original content designed for the best experience.</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚙️</div>
+                    <h3>Custom Plugins</h3>
+                    <p>Every core gameplay mechanic is built from scratch by our team. No off-the-shelf plugins — everything is crafted specifically for NightfallNetwork.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Unique Gameplay</h3>
+                    <p>Experience systems you won't find anywhere else. From custom combat mechanics to exclusive economy features — tailored for our community.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💨</div>
+                    <h3>High Performance</h3>
+                    <p>Optimized servers running on premium hardware. Expect smooth gameplay, minimal lag, and consistent uptime so you can focus on what matters.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Anti-Cheat Protection</h3>
+                    <p>Custom-built anti-cheat systems keep gameplay fair for everyone. Our team actively monitors and updates protections against the latest exploits.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Active Community</h3>
+                    <p>Join a growing community of players who share your passion. Regular events, tournaments, and updates keep the experience fresh and exciting.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⭐</div>
+                    <h3>Regular Updates</h3>
+                    <p>Our development team ships new content and improvements constantly. Follow our Discord to stay up to date with every patch and announcement.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How to Join Section -->
+        <section class="how-to-join" id="how-to-join">
+            <div class="how-to-join-container">
+                <div class="section-label">GET STARTED</div>
+                <h2 class="section-title">How to Join</h2>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-number">01</div>
+                        <h3>Launch Minecraft</h3>
+                        <p>Open Minecraft Java Edition on your PC.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">02</div>
+                        <h3>Multiplayer</h3>
+                        <p>Click 'Multiplayer' from the main menu.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">03</div>
+                        <h3>Add Server</h3>
+                        <p>Click 'Add Server' and paste the IP below.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">04</div>
+                        <h3>Join & Play</h3>
+                        <p>Hit connect and enter the NightfallNetwork!</p>
+                    </div>
+                </div>
+                <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px;">Copy the server IP and paste it in Minecraft:</p>
+                <div class="ip-box" style="margin-bottom: 0;">
+                    <div class="ip-label">SERVER IP</div>
+                    <div class="ip-address">nightfallnetwork.xyz</div>
+                    <button class="copy-btn" onclick="copyToClipboard('nightfallnetwork.xyz')">📋</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Store Section -->
+        <section class="store-section">
+            <div class="store-container">
+                <p>NightfallNetwork is a passion project — we don't make any money from it. Servers, domains, and development all cost money. By visiting our store, you help cover those costs and keep the community alive. Every purchase directly supports the server.</p>
+                <button class="visit-store-btn" onclick="alert('Store coming soon!')">🛍️ VISIT STORE</button>
+                <p class="store-notice">Store link coming soon — stay tuned!</p>
+            </div>
+        </section>
+
+        <!-- Discord Section -->
+        <section class="discord-section" id="discord">
+            <div class="discord-content">
+                <div class="discord-left">
+                    <h2>Join Our Discord</h2>
+                    <p>Stay connected with the NightfallNetwork community. Get announcements, chat with other players, report bugs, and interact with our custom-built Discord bots that help manage the server and community.</p>
+                    <div class="discord-features">
+                        <div class="discord-feature">
+                            <div class="discord-feature-icon">🤖</div>
+                            <div class="discord-feature-text">
+                                <h4>Custom Discord Bots</h4>
+                                <p>Self-made bots for moderation, tickets & server stats</p>
+                            </div>
+                        </div>
+                        <div class="discord-feature">
+                            <div class="discord-feature-icon">💬</div>
+                            <div class="discord-feature-text">
+                                <h4>Active Community Chat</h4>
+                                <p>Talk with staff and players anytime</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="join-discord-btn" onclick="alert('Discord link coming soon!')">Join Discord</button>
+                </div>
+                <div class="discord-right">
+                    <div class="discord-icon">💬</div>
+                    <h3>Custom Bots</h3>
+                    <p>Built in-house for our community</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Plugins Section -->
+        <section class="plugins-section">
+            <div class="plugins-container">
+                <div class="section-label">OUR PRIDE</div>
+                <h2>100% Self-Made Plugins</h2>
+                <p>Every single plugin powering NightfallNetwork was written by our own developers. This means faster updates, better quality, and features you'll only ever find here. We don't settle for generic — we build exactly what our community needs.</p>
+                <div class="plugins-tags">
+                    <span class="plugin-tag">Custom Economy</span>
+                    <span class="plugin-tag">Unique Combat</span>
+                    <span class="plugin-tag">Player Quests</span>
+                    <span class="plugin-tag">Rank System</span>
+                    <span class="plugin-tag">Anti-Cheat</span>
+                    <span class="plugin-tag">Custom Events</span>
+                    <span class="plugin-tag">Guild System</span>
+                    <span class="plugin-tag">Auction House</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div style="margin-bottom: 20px;">
+            <a href="#" class="logo" style="justify-content: center;">
+                <span>Nightfall</span>Network
+            </a>
+        </div>
+        <p>Not affiliated with Mojang or Microsoft. Minecraft is a trademark of Mojang Studios.</p>
+        <p>© 2026 NightfallNetwork</p>
+    </footer>
+
+    <script>
+        // Generate random particles in background
+        function generateParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 15 + 20) + 's';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Copy IP to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('IP copied to clipboard! 📋');
+            });
+        }
+
+        // Initialize
+        generateParticles();
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#') {
+                    e.preventDefault();
+                    const element = document.querySelector(href);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
