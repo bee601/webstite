@@ -111,6 +111,7 @@
             background: transparent;
             transition: all 0.3s;
             font-weight: 600;
+            text-decoration: none;
         }
 
         .btn-store:hover {
@@ -175,69 +176,6 @@
         @keyframes slideUp {
             from { transform: translateY(30px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
-        }
-
-        .status-box {
-            border: 1px solid var(--primary);
-            border-radius: 12px;
-            padding: 30px;
-            width: fit-content;
-            margin: 0 auto;
-            animation: slideUp 0.8s ease-out 0.6s both;
-        }
-
-        .status-box h3 {
-            color: var(--text-muted);
-            font-size: 12px;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-        }
-
-        .player-count {
-            font-size: 48px;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
-
-        .server-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            justify-content: center;
-            font-size: 14px;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--primary);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .refresh-btn {
-            margin-top: 15px;
-            background: none;
-            border: none;
-            color: var(--primary);
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-left: auto;
-            margin-right: auto;
-            transition: opacity 0.3s;
-        }
-
-        .refresh-btn:hover {
-            opacity: 0.7;
         }
 
         /* Server IP Section */
@@ -466,6 +404,8 @@
             font-weight: 600;
             transition: all 0.3s;
             font-size: 16px;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .join-discord-btn:hover {
@@ -590,6 +530,7 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
+            text-decoration: none;
         }
 
         .visit-store-btn:hover {
@@ -662,7 +603,7 @@
             <a href="#features">Features</a>
             <a href="#how-to-join">How to Join</a>
             <a href="#discord">Discord</a>
-            <button class="btn-store" onclick="alert('Store coming soon!')">🛍️ Store</button>
+            <a href="https://discord.gg/jDPdyG5m3Z" class="btn-store" target="_blank">🛍️ Store</a>
         </nav>
     </header>
 
@@ -672,15 +613,6 @@
             <div class="hero-logo">🌙</div>
             <h1><span class="primary">Nightfall</span> Network</h1>
             <p class="hero-subtitle">A Minecraft server built different — custom plugins, unique gameplay, and a thriving community waiting for you.</p>
-            <div class="status-box">
-                <h3>👥 PLAYERS ONLINE</h3>
-                <div class="player-count">0</div>
-                <div class="server-status">
-                    <div class="status-dot"></div>
-                    <span>SERVER ONLINE</span>
-                </div>
-                <button class="refresh-btn">🔄 Refresh</button>
-            </div>
         </section>
 
         <!-- Server IP Section -->
@@ -774,7 +706,7 @@
         <section class="store-section">
             <div class="store-container">
                 <p>NightfallNetwork is a passion project — we don't make any money from it. Servers, domains, and development all cost money. By visiting our store, you help cover those costs and keep the community alive. Every purchase directly supports the server.</p>
-                <button class="visit-store-btn" onclick="alert('Store coming soon!')">🛍️ VISIT STORE</button>
+                <a href="https://discord.gg/jDPdyG5m3Z" class="visit-store-btn" target="_blank">🛍️ VISIT STORE</a>
                 <p class="store-notice">Store link coming soon — stay tuned!</p>
             </div>
         </section>
@@ -801,7 +733,7 @@
                             </div>
                         </div>
                     </div>
-                    <button class="join-discord-btn" onclick="alert('Discord link coming soon!')">Join Discord</button>
+                    <a href="https://discord.gg/jDPdyG5m3Z" class="join-discord-btn" target="_blank">Join Discord</a>
                 </div>
                 <div class="discord-right">
                     <div class="discord-icon">💬</div>
